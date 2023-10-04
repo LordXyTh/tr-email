@@ -58,5 +58,5 @@ if __name__ == "__main__":
         insert_csv_to_table('sender_emails.csv', 'sender_emails')
     else:
         insert_csv_to_table('test_target_emails.csv', 'target_emails')
-        insert_csv_to_table('test_sender_emails.csv', 'sender_emails')
+        insert_csv_to_table('sender_emails.csv', 'sender_emails')
 

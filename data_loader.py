@@ -2,7 +2,7 @@ import sqlite3
 import csv
 
 DATABASE_NAME = "emails.db"
-TESTING = True
+TESTING = False
 def create_tables():
     conn = sqlite3.connect(DATABASE_NAME)
     cursor = conn.cursor()

@@ -9,7 +9,7 @@ import time
 
 
 DATABASE_NAME = "emails.db"
-LIMIT_PER_SENDER = 100
+LIMIT_PER_SENDER = 732
 EMAIL_TEMPLATE_FILE = "email_templates.json"
 SUBJECT_TEMPLATE_FILE = "subject_templates.json"
 BCC_EMAIL = "hello@liberv.community"
@@ -70,34 +70,32 @@ def send_emails():
         target_emails = get_target_emails(sender_id)
         selected_targets = random.sample(target_emails, min(LIMIT_PER_SENDER, len(target_emails)))
         mail_server = "mail."+sender_email.split("@")[1]
-        print(mail_server)
-        with smtplib.SMTP(mail_server, 587) as server:  # Replace with your SMTP server
-            server.starttls()
-            print(sender_email, sender_password)
-            server.login(sender_email, sender_password)
+        try:
+            with smtplib.SMTP(mail_server, 587) as server:  # Replace with your SMTP server
+                server.starttls()
+                print(sender_email, sender_password)
+                server.login(sender_email, sender_password)
 
-            for target_email in selected_targets:
-                email_content = get_random_template(email_templates)
-                subject = get_random_subject(subject_templates)
+                for target_email in selected_targets:
+                    email_content = get_random_template(email_templates)
+                    subject = get_random_subject(subject_templates)
+                    
+                    # Replace the {{ variable }} with any appropriate content
+                    email_content = email_content.replace("{{name}}", "SomeContent")
+                    
+                    # Construct the MIMEText email
+                    msg = MIMEText(email_content, 'plain', 'utf-8')
+                    msg['Subject'] = Header(subject, 'utf-8')
+                    msg['From'] = sender_email
+                    msg['To'] = target_email
+                    print(f"using {email_content} as msg")
+                    server.sendmail(sender_email, [target_email, BCC_EMAIL], msg.as_string())
                 
-                # Replace the {{ variable }} with any appropriate content
-                email_content = email_content.replace("{{name}}", "SomeContent")
-                
-                # Construct the MIMEText email
-                msg = MIMEText(email_content, 'plain', 'utf-8')
-                msg['Subject'] = Header(subject, 'utf-8')
-                msg['From'] = sender_email
-                msg['To'] = target_email
-                
-                server.sendmail(sender_email, [target_email, BCC_EMAIL], msg.as_string())
-                
-                print("sent")
-                mark_email_as_sent(sender_id, target_email)
-                
-
-if __name__ == "__main__":
-    print("sending")
-    send_emails()
+                    print(f"sent mail from {sender_email} to {target_email}")
+                    mark_email_as_sent(sender_id, target_email)
+        except Exception as e:
+            print(f"error {e}")
+            continue
 
 if __name__ == "__main__":
     print("sending")

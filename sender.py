@@ -9,7 +9,7 @@ import time
 
 
 DATABASE_NAME = "emails.db"
-LIMIT_PER_SENDER = 732
+LIMIT_PER_SENDER = 2
 EMAIL_TEMPLATE_FILE = "email_templates.json"
 SUBJECT_TEMPLATE_FILE = "subject_templates.json"
 BCC_EMAIL = "hello@liberv.community"
@@ -70,6 +70,8 @@ def send_emails():
         target_emails = get_target_emails(sender_id)
         selected_targets = random.sample(target_emails, min(LIMIT_PER_SENDER, len(target_emails)))
         mail_server = "mail."+sender_email.split("@")[1]
+        if sender_email.split("@")[1] == "vogt-tabak.de":
+            continue
         try:
             with smtplib.SMTP(mail_server, 587) as server:  # Replace with your SMTP server
                 server.starttls()

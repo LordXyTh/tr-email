@@ -9,9 +9,10 @@ import time
 
 
 DATABASE_NAME = "emails.db"
-LIMIT_PER_SENDER = 2
+LIMIT_PER_SENDER = 1
 EMAIL_TEMPLATE_FILE = "email_templates.json"
 SUBJECT_TEMPLATE_FILE = "subject_templates.json"
+CANNABIS_TEMPLATES_FILE = "cannabis_templates.json"
 BCC_EMAIL = "hello@liberv.community"
 def load_email_templates():
     with open(EMAIL_TEMPLATE_FILE, 'r') as file:
@@ -21,11 +22,19 @@ def load_subject_templates():
     with open(SUBJECT_TEMPLATE_FILE, 'r') as file:
         return json.load(file)
 
+def load_cannabis_templates():
+    with open(CANNABIS_TEMPLATES_FILE, 'r') as file:
+        return json.load(file)
+
 def get_random_template(templates):
     return random.choice(list(templates.values()))
 
 def get_random_subject(subjects):
     return random.choice(list(subjects.values()))
+
+def get_cannabis_template(templates):
+    random_key = random.choice(list(templates.keys()))
+    return random_key, templates[random_key]
 
 def get_target_emails(sender_id):
     conn = sqlite3.connect(DATABASE_NAME)
@@ -65,6 +74,7 @@ def send_emails():
     logging.info(f"I got credentials {sender_credentials}")
     email_templates = load_email_templates()
     subject_templates = load_subject_templates()
+    cannabis_templates = load_cannabis_templates()
 
     for sender_id, sender_email, sender_password in sender_credentials:
         target_emails = get_target_emails(sender_id)
@@ -79,8 +89,11 @@ def send_emails():
                 server.login(sender_email, sender_password)
 
                 for target_email in selected_targets:
-                    email_content = get_random_template(email_templates)
-                    subject = get_random_subject(subject_templates)
+                    if random.choice([True, False]):
+                        email_content = get_random_template(email_templates)
+                        subject = get_random_subject(subject_templates)
+                    else:
+                        subject, email_content = get_cannabis_template(cannabis_templates)
                     
                     # Replace the {{ variable }} with any appropriate content
                     email_content = email_content.replace("{{name}}", "SomeContent")

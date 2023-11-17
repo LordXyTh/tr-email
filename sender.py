@@ -15,7 +15,7 @@ EMAIL_TEMPLATE_FILE = "email_templates.json"
 SUBJECT_TEMPLATE_FILE = "subject_templates.json"
 CANNABIS_TEMPLATES_FILE = "cannabis_templates.json"
 BCC_EMAIL = "hello@liberv.community"
-MAX_EMAIL = 1
+MAX_EMAIL = 10
 def load_email_templates():
     with open(EMAIL_TEMPLATE_FILE, 'r') as file:
         return json.load(file)

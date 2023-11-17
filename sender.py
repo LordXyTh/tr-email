@@ -70,8 +70,9 @@ def mark_email_as_sent(sender_id, target_email):
     conn.close()
 
 def send_emails():
+    print("getting credentials")
     sender_credentials = get_sender_emails()
-    logging.info(f"I got credentials {sender_credentials}")
+    print(f"I got credentials {sender_credentials}")
     email_templates = load_email_templates()
     subject_templates = load_subject_templates()
     cannabis_templates = load_cannabis_templates()

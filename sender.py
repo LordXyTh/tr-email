@@ -14,6 +14,7 @@ EMAIL_TEMPLATE_FILE = "email_templates.json"
 SUBJECT_TEMPLATE_FILE = "subject_templates.json"
 CANNABIS_TEMPLATES_FILE = "cannabis_templates.json"
 BCC_EMAIL = "hello@liberv.community"
+TOTAL_SENT = 10
 def load_email_templates():
     with open(EMAIL_TEMPLATE_FILE, 'r') as file:
         return json.load(file)
@@ -76,42 +77,44 @@ def send_emails():
     email_templates = load_email_templates()
     subject_templates = load_subject_templates()
     cannabis_templates = load_cannabis_templates()
+    emails_sent = 0
+    while emails_sent < TOTAL_SENT:
+        for sender_id, sender_email, sender_password in sender_credentials:
+            target_emails = get_target_emails(sender_id)
+            selected_targets = random.sample(target_emails, min(LIMIT_PER_SENDER, len(target_emails)))
+            mail_server = "mail."+sender_email.split("@")[1]
+            if sender_email.split("@")[1] == "vogt-tabak.de":
+                continue
+            try:
+                with smtplib.SMTP(mail_server, 587) as server:  # Replace with your SMTP server
+                    server.starttls()
+                    print(sender_email, sender_password)
+                    server.login(sender_email, sender_password)
 
-    for sender_id, sender_email, sender_password in sender_credentials:
-        target_emails = get_target_emails(sender_id)
-        selected_targets = random.sample(target_emails, min(LIMIT_PER_SENDER, len(target_emails)))
-        mail_server = "mail."+sender_email.split("@")[1]
-        if sender_email.split("@")[1] == "vogt-tabak.de":
-            continue
-        try:
-            with smtplib.SMTP(mail_server, 587) as server:  # Replace with your SMTP server
-                server.starttls()
-                print(sender_email, sender_password)
-                server.login(sender_email, sender_password)
-
-                for target_email in selected_targets:
-                    if random.choice([True, False]):
-                        email_content = get_random_template(email_templates)
-                        subject = get_random_subject(subject_templates)
-                    else:
-                        subject, email_content = get_cannabis_template(cannabis_templates)
+                    for target_email in selected_targets:
+                        if random.choice([True, False]):
+                            email_content = get_random_template(email_templates)
+                            subject = get_random_subject(subject_templates)
+                        else:
+                            subject, email_content = get_cannabis_template(cannabis_templates)
+                        
+                        # Replace the {{ variable }} with any appropriate content
+                        email_content = email_content.replace("{{name}}", "SomeContent")
+                        
+                        # Construct the MIMEText email
+                        msg = MIMEText(email_content, 'plain', 'utf-8')
+                        msg['Subject'] = Header(subject, 'utf-8')
+                        msg['From'] = sender_email
+                        msg['To'] = target_email
+                        print(f"using {email_content} as msg")
+                        server.sendmail(sender_email, [target_email, BCC_EMAIL], msg.as_string())
                     
-                    # Replace the {{ variable }} with any appropriate content
-                    email_content = email_content.replace("{{name}}", "SomeContent")
-                    
-                    # Construct the MIMEText email
-                    msg = MIMEText(email_content, 'plain', 'utf-8')
-                    msg['Subject'] = Header(subject, 'utf-8')
-                    msg['From'] = sender_email
-                    msg['To'] = target_email
-                    print(f"using {email_content} as msg")
-                    server.sendmail(sender_email, [target_email, BCC_EMAIL], msg.as_string())
-                
-                    print(f"sent mail from {sender_email} to {target_email}")
-                    mark_email_as_sent(sender_id, target_email)
-        except Exception as e:
-            print(f"error {e}")
-            continue
+                        print(f"sent mail from {sender_email} to {target_email}")
+                        mark_email_as_sent(sender_id, target_email)
+                        emails_sent += 1
+            except Exception as e:
+                print(f"error {e}")
+                continue
 
 if __name__ == "__main__":
     print("sending")

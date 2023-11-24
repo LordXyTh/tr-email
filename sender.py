@@ -9,13 +9,13 @@ import time
 import sys
 
 
-DATABASE_NAME = "emails.db"
-LIMIT_PER_SENDER = 1
-EMAIL_TEMPLATE_FILE = "email_templates.json"
-SUBJECT_TEMPLATE_FILE = "subject_templates.json"
-CANNABIS_TEMPLATES_FILE = "cannabis_templates.json"
+DATABASE_NAME = "/home/ubuntu/tr-email/emails.db"
+LIMIT_PER_SENDER = 3
+EMAIL_TEMPLATE_FILE = "/home/ubuntu/tr-email/email_templates.json"
+SUBJECT_TEMPLATE_FILE = "/home/ubuntu/tr-email/subject_templates.json"
+CANNABIS_TEMPLATES_FILE = "/home/ubuntu/tr-email/cannabis_templates.json"
 BCC_EMAIL = "hello@liberv.community"
-MAX_EMAIL = 10
+MAX_EMAIL = 20
 def load_email_templates():
     with open(EMAIL_TEMPLATE_FILE, 'r') as file:
         return json.load(file)
